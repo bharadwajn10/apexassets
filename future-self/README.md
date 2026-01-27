@@ -1,11 +1,3 @@
-Got it. Below is a **strictly professional, clean, submission-ready README** for the **Future Self module**.
-No emojis. No casual tone. Suitable for GitHub, evaluators, and collaborators.
-
-You can **directly copy and paste** this into
-`src/future-self/README.md`.
-
----
-
 # Future Self Module
 
 ## Overview
@@ -51,25 +43,25 @@ Those responsibilities belong to the **Story Mode module**.
 
 ```
 future-self/
+├── components/
+│   ├── FutureAvatar.jsx
+│   ├── ProbabilityBar.jsx
+│   └── WarningAlert.jsx
+│
 ├── context/
 │   └── GameStateContext.js
-│
-├── engine/
-│   ├── ProbabilityEngine.js
-│   └── WarningEngine.js
 │
 ├── data/
 │   ├── goals.js
 │   ├── futureMessages.js
 │   └── indicators.js
 │
+├── engine/
+│   ├── ProbabilityEngine.js
+│   └── WarningEngine.js
+│
 ├── screens/
 │   └── FutureSelf.jsx
-│
-├── components/
-│   ├── ProbabilityBar.jsx
-│   ├── WarningAlert.jsx
-│   └── FutureAvatar.jsx
 │
 └── README.md
 ```
