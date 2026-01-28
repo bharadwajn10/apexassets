@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'models/user_progress.dart';
-import 'features/home/home_screen.dart'; // Import the new home file
+import 'features/home/home_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,7 +11,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Lead Logic: Initialize the shared state here
     final UserProgress globalProgress = UserProgress(
       budgetingLevel: 1,
       digitalFinanceLevel: 1,
@@ -21,8 +20,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Rokka Mestru',
-      theme: ThemeData(primarySwatch: Colors.teal, useMaterial3: true),
-      // Pass the state down to the home screen
+      theme: ThemeData(
+        primarySwatch: Colors.teal,
+        useMaterial3: true,
+      ),
       home: HomeScreen(globalProgress: globalProgress),
     );
   }
