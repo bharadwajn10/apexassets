@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
       budgetingLevel: 1,
       digitalFinanceLevel: 1,
       fraudAwarenessLevel: 1,
+      storyModeLevel: 1,
     );
 
     return MaterialApp(
