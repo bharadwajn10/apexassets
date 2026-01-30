@@ -1,6 +1,119 @@
 import 'package:flutter/material.dart';
 import '../../models/user_progress.dart';
 
+class _StoryScenario {
+  final int levelId;
+  final String title;
+  final String prompt;
+  final double income;
+  final double rent;
+  final double minSavingsPercent;
+  final double minEmergencyAmount;
+
+  const _StoryScenario({
+    required this.levelId,
+    required this.title,
+    required this.prompt,
+    required this.income,
+    required this.rent,
+    required this.minSavingsPercent,
+    required this.minEmergencyAmount,
+  });
+}
+
+const List<_StoryScenario> _storyScenarios = [
+  _StoryScenario(
+    levelId: 1,
+    title: 'First Paycheck Budget',
+    prompt: 'You just got your first salary. Cover essentials, build a safety net, and start saving.',
+    income: 30000,
+    rent: 12000,
+    minSavingsPercent: 0.10,
+    minEmergencyAmount: 500,
+  ),
+  _StoryScenario(
+    levelId: 2,
+    title: 'Unexpected Medical Expense',
+    prompt: 'You had a minor medical bill last month. Prioritize emergency funds while still saving something.',
+    income: 32000,
+    rent: 13000,
+    minSavingsPercent: 0.08,
+    minEmergencyAmount: 2000,
+  ),
+  _StoryScenario(
+    levelId: 3,
+    title: 'EMI Month',
+    prompt: 'You have an EMI + bills. Don’t zero out emergency funds, and keep saving consistently.',
+    income: 35000,
+    rent: 15000,
+    minSavingsPercent: 0.10,
+    minEmergencyAmount: 1500,
+  ),
+  _StoryScenario(
+    levelId: 4,
+    title: 'Family Function',
+    prompt: 'There is a family function coming up. Plan household spending without sacrificing savings discipline.',
+    income: 38000,
+    rent: 16000,
+    minSavingsPercent: 0.12,
+    minEmergencyAmount: 2000,
+  ),
+  _StoryScenario(
+    levelId: 5,
+    title: 'Goal: New Phone',
+    prompt: 'You want a new phone. Save meaningfully but keep emergency money intact.',
+    income: 42000,
+    rent: 17000,
+    minSavingsPercent: 0.15,
+    minEmergencyAmount: 2500,
+  ),
+  _StoryScenario(
+    levelId: 6,
+    title: 'Job Switch Buffer',
+    prompt: 'You might switch jobs. Build a stronger emergency buffer while continuing savings.',
+    income: 45000,
+    rent: 18000,
+    minSavingsPercent: 0.12,
+    minEmergencyAmount: 5000,
+  ),
+  _StoryScenario(
+    levelId: 7,
+    title: 'Supporting Parents',
+    prompt: 'You need to support parents this month. Balance household needs with emergency + savings.',
+    income: 40000,
+    rent: 15000,
+    minSavingsPercent: 0.10,
+    minEmergencyAmount: 3000,
+  ),
+  _StoryScenario(
+    levelId: 8,
+    title: 'High Utility Bills',
+    prompt: 'Utility bills spiked. Cover essentials but don’t skip emergency funding.',
+    income: 36000,
+    rent: 14000,
+    minSavingsPercent: 0.08,
+    minEmergencyAmount: 2000,
+  ),
+  _StoryScenario(
+    levelId: 9,
+    title: 'Savings Challenge',
+    prompt: 'Try to hit a strong savings target while keeping emergency money healthy.',
+    income: 50000,
+    rent: 20000,
+    minSavingsPercent: 0.20,
+    minEmergencyAmount: 5000,
+  ),
+  _StoryScenario(
+    levelId: 10,
+    title: 'Financial Stability',
+    prompt: 'Demonstrate a stable plan: save, fund emergency, and allocate the rest thoughtfully.',
+    income: 55000,
+    rent: 22000,
+    minSavingsPercent: 0.18,
+    minEmergencyAmount: 7000,
+  ),
+];
+
 class StoryScreen extends StatefulWidget {
   final UserProgress userProgress;
   final int levelId;
@@ -13,30 +126,38 @@ class StoryScreen extends StatefulWidget {
 class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin {
   late AnimationController _characterController;
   late Animation<double> _characterAnimation;
-  
-  final double totalIncome = 30000;
-  final double rentFixed = 12000;
-  
+
+  late final _StoryScenario _scenario;
+  late final double totalIncome;
+  late final double rentFixed;
+
   Map<String, double> jars = {
     "Savings": 0,
     "Emergency Fund": 0,
     "Household": 0,
   };
-  
+
   @override
   void initState() {
     super.initState();
+    _scenario = _storyScenarios.firstWhere(
+      (s) => s.levelId == widget.levelId,
+      orElse: () => _storyScenarios.first,
+    );
+    totalIncome = _scenario.income;
+    rentFixed = _scenario.rent;
     _characterController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
     );
+
     _characterAnimation = CurvedAnimation(
       parent: _characterController,
       curve: Curves.easeInOut,
     );
     _characterController.repeat(reverse: true);
   }
-  
+
   @override
   void dispose() {
     _characterController.dispose();
@@ -44,6 +165,19 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
   }
 
   double get remainingToAllot => totalIncome - rentFixed - jars.values.fold(0, (a, b) => a + b);
+
+  bool get _isBestDecision {
+    final double savings = jars["Savings"] ?? 0;
+    final double emergency = jars["Emergency Fund"] ?? 0;
+    final double minSavingsAmount = totalIncome * _scenario.minSavingsPercent;
+    return remainingToAllot == 0 && savings >= minSavingsAmount && emergency >= _scenario.minEmergencyAmount;
+  }
+
+  void _resetAllocations() {
+    setState(() {
+      jars.updateAll((key, value) => 0);
+    });
+  }
 
   void _showAmountDialog(String jarName) {
     final TextEditingController _controller = TextEditingController();
@@ -76,13 +210,12 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
       ),
     );
   }
-  
+
   void _handleDrop(String jarName) {
     _showAmountDialog(jarName);
   }
 
   Color _getDarkerColor(Color color) {
-    // Create a darker version of the color
     return Color.fromARGB(
       color.alpha,
       (color.red * 0.7).round(),
@@ -96,12 +229,14 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
     double savings = jars["Savings"]!;
     double emergency = jars["Emergency Fund"]!;
 
-    if (savings < 3000) {
-      advice = "You're living a bit dangerously! Try to save at least 10% (₹3,000) for your future goals.";
-    } else if (emergency == 0) {
-      advice = "What if the fridge breaks or someone gets sick? Always put a little in the Emergency Fund first.";
+    final double minSavingsAmount = totalIncome * _scenario.minSavingsPercent;
+
+    if (savings < minSavingsAmount) {
+      advice = "Savings target missed. Aim for at least ₹${minSavingsAmount.toInt()} this level.";
+    } else if (emergency < _scenario.minEmergencyAmount) {
+      advice = "Emergency fund is too low. Keep at least ₹${_scenario.minEmergencyAmount.toInt()} for safety.";
     } else {
-      advice = "Excellent planning! You've balanced your present needs with your future security.";
+      advice = "Excellent planning. You met the targets for savings and emergency funds.";
     }
 
     showDialog(
@@ -109,16 +244,22 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
       builder: (context) => AlertDialog(
         title: const Text("Smart Advisor Response"),
         content: Text(advice),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              widget.userProgress.budgetingLevel += 1; // Level Up!
-              Navigator.pop(context); // Close Dialog
-              Navigator.pop(context, true); // Return to Map
-            },
-            child: const Text("Complete Level"),
-          )
-        ],
+        actions: _isBestDecision
+            ? [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pop(context, true);
+                  },
+                  child: const Text("Complete Level"),
+                )
+              ]
+            : [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Try Again"),
+                )
+              ],
       ),
     );
   }
@@ -131,7 +272,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFFFF0F5), Color(0xFFE6F3FF)],
+            colors: [Color(0xFF0F172A), Color(0xFF111827)],
           ),
         ),
         child: SafeArea(
@@ -145,32 +286,38 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
                     children: [
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back, color: Colors.pink),
+                        icon: const Icon(Icons.arrow_back, color: Color(0xFFE5E7EB)),
                       ),
                       Text(
                         "Level ${widget.levelId}",
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.pink,
+                          color: Color(0xFFE5E7EB),
                         ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        tooltip: 'Reset allocations',
+                        onPressed: _resetAllocations,
+                        icon: const Icon(Icons.restart_alt, color: Color(0xFFE5E7EB)),
                       ),
                     ],
                   ),
                 ),
-                
+
                 // Animated Character
                 _buildAnimatedCharacter(),
-                
+
                 // Money Bundle
                 _buildMoneyBundle(),
-                
+
                 // Income Summary
                 _buildIncomeSummary(),
-                
+
                 // Kitchen Counter with Jars
                 _buildKitchenCounter(),
-                
+
                 // Complete Button
                 if (remainingToAllot == 0)
                   Padding(
@@ -187,7 +334,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
                       ),
                     ),
                   ),
-                
+
                 const SizedBox(height: 50), // Extra padding at bottom
               ],
             ),
@@ -205,13 +352,13 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: const Color(0xFF111827),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.pink.withOpacity(0.2),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
+                color: const Color(0xFF000000),
+                blurRadius: 18,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
@@ -224,42 +371,50 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: const LinearGradient(
-                    colors: [Colors.pink, Colors.purple],
+                    colors: [Color(0xFF334155), Color(0xFF0F172A)],
                   ),
                 ),
                 child: const Icon(
-                  Icons.face,
-                  color: Colors.white,
+                  Icons.account_balance,
+                  color: Color(0xFFE5E7EB),
                   size: 50,
                 ),
               ),
               const SizedBox(width: 20),
-              
+
               // Speech Bubble
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
-                    color: Colors.pink.shade50,
+                    color: const Color(0xFF0B1220),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Hi! I earned ₹30,000 this month.",
-                        style: TextStyle(
+                      Text(
+                        _scenario.title,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.pink,
+                          color: Color(0xFFE5E7EB),
                         ),
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        "Help me plan my budget! Drag the money to the jars.",
+                        _scenario.prompt,
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey.shade700,
+                          color: const Color(0xFF9CA3AF),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Income: ₹${totalIncome.toInt()}  |  Rent: ₹${rentFixed.toInt()}",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF9CA3AF),
                         ),
                       ),
                     ],
@@ -278,6 +433,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Draggable<String>(
         data: 'money',
+        dragAnchorStrategy: pointerDragAnchorStrategy,
         feedback: Material(
           color: Colors.transparent,
           child: Container(
@@ -433,8 +589,15 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.blue.shade100,
+        color: const Color(0xFF0B1220),
         borderRadius: BorderRadius.circular(15),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0xFF000000),
+            blurRadius: 18,
+            offset: Offset(0, 10),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -444,7 +607,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.blue,
+              color: Color(0xFFE5E7EB),
             ),
           ),
           Text(
@@ -452,7 +615,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.blue,
+              color: Color(0xFF34D399),
             ),
           ),
         ],
@@ -473,8 +636,8 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.brown.shade300,
-                  Colors.brown.shade500,
+                  Color(0xFF111827),
+                  Color(0xFF0B1220),
                 ],
               ),
               borderRadius: const BorderRadius.only(
@@ -483,9 +646,9 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.brown.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
+                  color: const Color(0xFF000000),
+                  blurRadius: 22,
+                  offset: const Offset(0, 12),
                 ),
               ],
             ),
@@ -495,12 +658,12 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   // Rent Jar (Fixed)
-                  _buildCounterJar("Rent", rentFixed, Colors.grey, isFixed: true),
+                  _buildCounterJar("Rent", rentFixed, const Color(0xFF6B7280), isFixed: true),
                   
                   // Interactive Jars
-                  _buildCounterJar("Savings", jars["Savings"]!, Colors.blue, isFixed: false),
-                  _buildCounterJar("Emergency", jars["Emergency Fund"]!, Colors.red, isFixed: false),
-                  _buildCounterJar("Household", jars["Household"]!, Colors.green, isFixed: false),
+                  _buildCounterJar("Savings", jars["Savings"]!, const Color(0xFF60A5FA), isFixed: false),
+                  _buildCounterJar("Emergency", jars["Emergency Fund"]!, const Color(0xFFF59E0B), isFixed: false),
+                  _buildCounterJar("Household", jars["Household"]!, const Color(0xFF34D399), isFixed: false),
                 ],
               ),
             ),
@@ -510,7 +673,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
           Container(
             height: 30,
             decoration: BoxDecoration(
-              color: Colors.brown.shade600,
+              color: const Color(0xFF0F172A),
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(10),
                 bottomRight: Radius.circular(10),
@@ -611,7 +774,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: const Color(0xFF0B1220),
                 borderRadius: BorderRadius.circular(5),
                 boxShadow: [
                   BoxShadow(
@@ -626,7 +789,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: isFixed ? Colors.grey : color,
+                  color: isFixed ? const Color(0xFF9CA3AF) : const Color(0xFFE5E7EB),
                 ),
               ),
             ),

@@ -20,36 +20,38 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
   int _targetLevelIndex = 0;
   bool _isJumping = false;
 
-  final List<Offset> points = [
-    const Offset(0.1, 0.85),  // Lvl 1
-    const Offset(0.25, 0.75), // Lvl 2
-    const Offset(0.15, 0.6),  // Lvl 3
-    const Offset(0.35, 0.5),  // Lvl 4
-    const Offset(0.2, 0.35),  // Lvl 5
-    const Offset(0.45, 0.25), // Lvl 6
-    const Offset(0.3, 0.15),  // Lvl 7
-    const Offset(0.55, 0.1),  // Lvl 8
-    const Offset(0.4, 0.05),  // Lvl 9
-    const Offset(0.65, 0.02), // Lvl 10
-  ];
+  late final List<Offset> points;
+  late final RainbowPathPainter _pathPainter;
 
   final List<Color> levelColors = [
-    Colors.pink,
-    Colors.purple,
-    Colors.blue,
-    Colors.cyan,
-    Colors.green,
-    Colors.yellow,
-    Colors.orange,
-    Colors.red,
-    Colors.indigo,
-    Colors.teal,
+    Color(0xFF0EA5A4),
+    Color(0xFF22C55E),
+    Color(0xFF3B82F6),
+    Color(0xFF14B8A6),
+    Color(0xFF10B981),
+    Color(0xFF38BDF8),
+    Color(0xFF2DD4BF),
+    Color(0xFF60A5FA),
+    Color(0xFF34D399),
+    Color(0xFF0EA5E9),
   ];
 
   @override
   void initState() {
     super.initState();
     _currentLevelIndex = widget.userProgress.storyModeLevel - 1;
+
+    const int levelCount = 10;
+    const double yStart = 0.9;
+    const double yEnd = 0.1;
+    final double step = (yStart - yEnd) / (levelCount - 1);
+    points = List.generate(levelCount, (i) {
+      final double y = yStart - (i * step);
+      final double x = i.isEven ? 0.25 : 0.75;
+      return Offset(x, y);
+    });
+
+    _pathPainter = RainbowPathPainter(points: points);
     
     _jumpController = AnimationController(
       vsync: this,
@@ -89,6 +91,18 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
     });
   }
 
+  void _showLockedLevelMessage() {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('Complete the previous level to unlock this one.'),
+        duration: Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _jumpController.dispose();
@@ -105,9 +119,9 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFFFF6E5),
-              Color(0xFFFFE5F1),
-              Color(0xFFE5F3FF),
+              Color(0xFF0B1220),
+              Color(0xFF0F172A),
+              Color(0xFF111827),
             ],
           ),
         ),
@@ -123,23 +137,30 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: const Color(0xFF0B1220),
                         borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.pink.withOpacity(0.3),
-                            blurRadius: 15,
-                            offset: const Offset(0, 5),
+                            color: Color(0xFF000000),
+                            blurRadius: 22,
+                            offset: Offset(0, 12),
                           ),
                         ],
                       ),
-                      child: const Text(
-                        "🌈 Story Adventure 🌈",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.pink,
-                        ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.trending_up, color: Color(0xFFE5E7EB), size: 22),
+                          SizedBox(width: 10),
+                          Text(
+                            "Story Mode",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFFE5E7EB),
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -150,50 +171,70 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    return Stack(
-                      children: [
-                        // Decorative clouds
-                        _buildDecorativeClouds(constraints),
-                        
-                        // The Curved Path
-                        CustomPaint(
-                          size: Size(constraints.maxWidth, constraints.maxHeight),
-                          painter: RainbowPathPainter(points: points),
-                        ),
-                        
-                        // Level Nodes
-                        ...List.generate(points.length, (index) {
-                          return Positioned(
-                            left: points[index].dx * constraints.maxWidth - 35,
-                            top: points[index].dy * constraints.maxHeight - 35,
-                            child: _buildLevelNode(index),
-                          );
-                        }),
+                    final double mapWidth = constraints.maxWidth;
+                    final double mapHeight = constraints.maxHeight * 2;
 
-                        // The Animated Character
-                        AnimatedBuilder(
-                          animation: Listenable.merge([_jumpAnimation, _bounceAnimation]),
-                          builder: (context, child) {
-                            final pos = _isJumping 
-                                ? Offset.lerp(
-                                    points[_currentLevelIndex],
-                                    points[_targetLevelIndex],
-                                    _jumpAnimation.value,
-                                  )!
-                                : points[_currentLevelIndex];
-                            
-                            final jumpHeight = _isJumping 
-                                ? (1 - _jumpAnimation.value) * 150 
-                                : _bounceAnimation.value * 20;
+                    return InteractiveViewer(
+                      constrained: false,
+                      panEnabled: true,
+                      scaleEnabled: false,
+                      boundaryMargin: const EdgeInsets.all(200),
+                      child: SizedBox(
+                        width: mapWidth,
+                        height: mapHeight,
+                        child: Stack(
+                          children: [
+                            // Decorative clouds
+                            RepaintBoundary(
+                              child: _buildDecorativeClouds(BoxConstraints(
+                                maxWidth: mapWidth,
+                                maxHeight: mapHeight,
+                              )),
+                            ),
 
-                            return Positioned(
-                              left: pos.dx * constraints.maxWidth - 30,
-                              top: pos.dy * constraints.maxHeight - 70 - jumpHeight,
-                              child: _buildCharacter(),
-                            );
-                          },
+                            // The Curved Path
+                            RepaintBoundary(
+                              child: CustomPaint(
+                                size: Size(mapWidth, mapHeight),
+                                painter: _pathPainter,
+                              ),
+                            ),
+
+                            // Level Nodes
+                            ...List.generate(points.length, (index) {
+                              return Positioned(
+                                left: points[index].dx * mapWidth - 35,
+                                top: points[index].dy * mapHeight - 35,
+                                child: _buildLevelNode(index),
+                              );
+                            }),
+
+                            // The Animated Character
+                            AnimatedBuilder(
+                              animation: Listenable.merge([_jumpAnimation, _bounceAnimation]),
+                              builder: (context, child) {
+                                final pos = _isJumping
+                                    ? Offset.lerp(
+                                        points[_currentLevelIndex],
+                                        points[_targetLevelIndex],
+                                        _jumpAnimation.value,
+                                      )!
+                                    : points[_currentLevelIndex];
+
+                                final jumpHeight = _isJumping
+                                    ? (1 - _jumpAnimation.value) * 150
+                                    : _bounceAnimation.value * 20;
+
+                                return Positioned(
+                                  left: pos.dx * mapWidth - 30,
+                                  top: pos.dy * mapHeight - 70 - jumpHeight,
+                                  child: _buildCharacter(),
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     );
                   },
                 ),
@@ -209,6 +250,9 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
     final isUnlocked = index <= widget.userProgress.storyModeLevel - 1;
     final isCurrent = index == _currentLevelIndex;
     final levelColor = levelColors[index % levelColors.length];
+
+    final Color base = isUnlocked ? levelColor : const Color(0xFF374151);
+    final Color highlight = isUnlocked ? const Color(0xFFE5E7EB) : const Color(0xFF9CA3AF);
 
     return GestureDetector(
       onTap: () async {
@@ -241,6 +285,8 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
             });
             _jumpToLevel(_currentLevelIndex + 1);
           }
+        } else if (!isUnlocked) {
+          _showLockedLevelMessage();
         }
       },
       child: AnimatedContainer(
@@ -255,7 +301,7 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
                 height: 80,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: levelColor.withOpacity(0.3),
+                  color: base.withOpacity(0.18),
                 ),
               ),
             
@@ -265,18 +311,29 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
               height: 70,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isUnlocked ? levelColor : Colors.grey.shade300,
+                gradient: RadialGradient(
+                  center: const Alignment(-0.4, -0.6),
+                  radius: 1.2,
+                  colors: [
+                    base.withOpacity(0.95),
+                    base.withOpacity(0.75),
+                    const Color(0xFF0B1220),
+                  ],
+                ),
                 border: Border.all(
-                  color: Colors.white,
+                  color: highlight.withOpacity(0.2),
                   width: 4,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: isUnlocked 
-                        ? levelColor.withOpacity(0.5)
-                        : Colors.grey.withOpacity(0.3),
-                    blurRadius: isCurrent ? 20 : 10,
-                    offset: const Offset(0, 5),
+                    color: const Color(0xFF000000),
+                    blurRadius: isCurrent ? 22 : 14,
+                    offset: const Offset(0, 10),
+                  ),
+                  BoxShadow(
+                    color: base.withOpacity(isUnlocked ? 0.18 : 0.10),
+                    blurRadius: isCurrent ? 26 : 16,
+                    offset: const Offset(0, 0),
                   ),
                 ],
               ),
@@ -286,16 +343,13 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
                   Text(
                     "${index + 1}",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: const Color(0xFFE5E7EB),
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                     ),
                   ),
                   if (!isUnlocked)
-                    const Text(
-                      "🔒",
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    const Icon(Icons.lock, size: 16, color: Color(0xFF9CA3AF)),
                 ],
               ),
             ),
@@ -312,12 +366,12 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
           width: 50,
           height: 50,
           decoration: BoxDecoration(
-            color: Colors.orange,
+            color: const Color(0xFF0EA5A4),
             borderRadius: BorderRadius.circular(25),
-            border: Border.all(color: Colors.white, width: 2),
+            border: Border.all(color: const Color(0xFFE5E7EB), width: 2),
             boxShadow: [
               BoxShadow(
-                color: Colors.orange.withOpacity(0.3),
+                color: const Color(0xFF0EA5A4).withOpacity(0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -325,7 +379,7 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
           ),
           child: const Icon(
             Icons.person,
-            color: Colors.white,
+            color: const Color(0xFFE5E7EB),
             size: 25,
           ),
         ),
@@ -333,7 +387,7 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
           margin: const EdgeInsets.only(top: 3),
           child: Icon(
             _isJumping ? Icons.arrow_upward : Icons.arrow_downward,
-            color: Colors.orange,
+            color: const Color(0xFF0EA5A4),
             size: 15,
           ),
         ),
@@ -351,7 +405,7 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
             width: 60,
             height: 30,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.6),
+              color: const Color(0xFF94A3B8).withOpacity(0.08),
               borderRadius: BorderRadius.circular(15),
             ),
           ),
@@ -363,7 +417,7 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
             width: 80,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.5),
+              color: const Color(0xFF94A3B8).withOpacity(0.06),
               borderRadius: BorderRadius.circular(20),
             ),
           ),
@@ -375,7 +429,7 @@ class _LevelMapScreenState extends State<LevelMapScreen> with TickerProviderStat
             width: 70,
             height: 35,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.4),
+              color: const Color(0xFF94A3B8).withOpacity(0.05),
               borderRadius: BorderRadius.circular(18),
             ),
           ),
@@ -394,7 +448,7 @@ class RainbowPathPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.pink.withOpacity(0.4)
+      ..color = const Color(0xFF60A5FA).withOpacity(0.25)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 8.0
       ..strokeCap = StrokeCap.round;
