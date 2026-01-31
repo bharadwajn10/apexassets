@@ -9,6 +9,7 @@ class _StoryScenario {
   final double rent;
   final double minSavingsPercent;
   final double minEmergencyAmount;
+  final List<String> jarNames;
 
   const _StoryScenario({
     required this.levelId,
@@ -18,10 +19,13 @@ class _StoryScenario {
     required this.rent,
     required this.minSavingsPercent,
     required this.minEmergencyAmount,
+    this.jarNames = const ["Savings", "Emergency Fund", "Household"],
   });
 }
 
 const List<_StoryScenario> _storyScenarios = [
+  // PHASE 1: BEGINNER LEVEL (Levels 1-20)
+  // Active Scenarios (1-10)
   _StoryScenario(
     levelId: 1,
     title: 'First Paycheck Budget',
@@ -43,7 +47,7 @@ const List<_StoryScenario> _storyScenarios = [
   _StoryScenario(
     levelId: 3,
     title: 'EMI Month',
-    prompt: 'You have an EMI + bills. Don’t zero out emergency funds, and keep saving consistently.',
+    prompt: 'You have an EMI + bills. Do not zero out emergency funds, and keep saving consistently.',
     income: 35000,
     rent: 15000,
     minSavingsPercent: 0.10,
@@ -88,7 +92,7 @@ const List<_StoryScenario> _storyScenarios = [
   _StoryScenario(
     levelId: 8,
     title: 'High Utility Bills',
-    prompt: 'Utility bills spiked. Cover essentials but don’t skip emergency funding.',
+    prompt: 'Utility bills spiked. Cover essentials but do not skip emergency funding.',
     income: 36000,
     rent: 14000,
     minSavingsPercent: 0.08,
@@ -112,7 +116,135 @@ const List<_StoryScenario> _storyScenarios = [
     minSavingsPercent: 0.18,
     minEmergencyAmount: 7000,
   ),
+  
+  // Placeholder Scenarios (11-20)
+  _StoryScenario(levelId: 11, title: 'Budget Practice 11', prompt: 'Continue building your budgeting skills.', income: 48000, rent: 19000, minSavingsPercent: 0.12, minEmergencyAmount: 4000),
+  _StoryScenario(levelId: 12, title: 'Budget Practice 12', prompt: 'Keep refining your financial planning.', income: 49000, rent: 19500, minSavingsPercent: 0.13, minEmergencyAmount: 4500),
+  _StoryScenario(levelId: 13, title: 'Budget Practice 13', prompt: 'Master the basics of money management.', income: 50000, rent: 20000, minSavingsPercent: 0.14, minEmergencyAmount: 5000),
+  _StoryScenario(levelId: 14, title: 'Budget Practice 14', prompt: 'Balance your financial priorities wisely.', income: 51000, rent: 20500, minSavingsPercent: 0.14, minEmergencyAmount: 5500),
+  _StoryScenario(levelId: 15, title: 'Budget Practice 15', prompt: 'Strengthen your emergency fund strategy.', income: 52000, rent: 21000, minSavingsPercent: 0.15, minEmergencyAmount: 6000),
+  _StoryScenario(levelId: 16, title: 'Budget Practice 16', prompt: 'Optimize your savings allocation.', income: 53000, rent: 21500, minSavingsPercent: 0.15, minEmergencyAmount: 6500),
+  _StoryScenario(levelId: 17, title: 'Budget Practice 17', prompt: 'Prepare for advanced financial scenarios.', income: 54000, rent: 22000, minSavingsPercent: 0.16, minEmergencyAmount: 7000),
+  _StoryScenario(levelId: 18, title: 'Budget Practice 18', prompt: 'Fine-tune your budgeting approach.', income: 55000, rent: 22500, minSavingsPercent: 0.16, minEmergencyAmount: 7500),
+  _StoryScenario(levelId: 19, title: 'Budget Practice 19', prompt: 'Almost ready for advanced challenges!', income: 56000, rent: 23000, minSavingsPercent: 0.17, minEmergencyAmount: 8000),
+  _StoryScenario(levelId: 20, title: 'Phase 1 Finale', prompt: 'Complete this level to unlock Advanced challenges!', income: 58000, rent: 24000, minSavingsPercent: 0.18, minEmergencyAmount: 8500),
+  
+  // PHASE 2: ADVANCED LEVEL (Levels 21-40)
+  // Active Scenarios (21-30) - Complex with 5+ jars
+  _StoryScenario(
+    levelId: 21,
+    title: 'Investment Journey Begins',
+    prompt: 'Start investing while managing debt. Allocate wisely across all financial priorities.',
+    income: 65000,
+    rent: 25000,
+    minSavingsPercent: 0.15,
+    minEmergencyAmount: 10000,
+    jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment"],
+  ),
+  _StoryScenario(
+    levelId: 22,
+    title: 'Debt Snowball Strategy',
+    prompt: 'Pay down high-interest debt aggressively while maintaining emergency funds.',
+    income: 68000,
+    rent: 26000,
+    minSavingsPercent: 0.12,
+    minEmergencyAmount: 12000,
+    jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment"],
+  ),
+  _StoryScenario(
+    levelId: 23,
+    title: 'Inflation Protection',
+    prompt: 'Prices are rising. Increase emergency buffer and invest to beat inflation.',
+    income: 70000,
+    rent: 28000,
+    minSavingsPercent: 0.18,
+    minEmergencyAmount: 15000,
+    jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment"],
+  ),
+  _StoryScenario(
+    levelId: 24,
+    title: 'Retirement Planning Start',
+    prompt: 'Begin long-term retirement savings while managing current obligations.',
+    income: 75000,
+    rent: 30000,
+    minSavingsPercent: 0.20,
+    minEmergencyAmount: 18000,
+    jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment", "Retirement"],
+  ),
+  _StoryScenario(
+    levelId: 25,
+    title: 'Multiple Financial Goals',
+    prompt: 'Balance short-term needs with long-term wealth building.',
+    income: 80000,
+    rent: 32000,
+    minSavingsPercent: 0.18,
+    minEmergencyAmount: 20000,
+    jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment", "Retirement"],
+  ),
+  _StoryScenario(
+    levelId: 26,
+    title: 'High Income, High Responsibility',
+    prompt: 'With higher income comes greater planning complexity. Optimize every rupee.',
+    income: 85000,
+    rent: 34000,
+    minSavingsPercent: 0.20,
+    minEmergencyAmount: 22000,
+    jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment", "Retirement"],
+  ),
+  _StoryScenario(
+    levelId: 27,
+    title: 'Tax Planning Integration',
+    prompt: 'Maximize tax-saving investments while meeting all financial targets.',
+    income: 90000,
+    rent: 36000,
+    minSavingsPercent: 0.22,
+    minEmergencyAmount: 25000,
+    jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment", "Retirement"],
+  ),
+  _StoryScenario(
+    levelId: 28,
+    title: 'Wealth Accumulation Phase',
+    prompt: 'Focus on building substantial wealth across multiple asset classes.',
+    income: 95000,
+    rent: 38000,
+    minSavingsPercent: 0.25,
+    minEmergencyAmount: 28000,
+    jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment", "Retirement"],
+  ),
+  _StoryScenario(
+    levelId: 29,
+    title: 'Financial Independence Path',
+    prompt: 'You are on the path to financial freedom. Make every allocation count.',
+    income: 98000,
+    rent: 39000,
+    minSavingsPercent: 0.28,
+    minEmergencyAmount: 30000,
+    jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment", "Retirement"],
+  ),
+  _StoryScenario(
+    levelId: 30,
+    title: 'Master Budgeter',
+    prompt: 'Demonstrate mastery of complex financial planning with multiple priorities.',
+    income: 100000,
+    rent: 40000,
+    minSavingsPercent: 0.30,
+    minEmergencyAmount: 35000,
+    jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment", "Retirement"],
+  ),
+  
+  // Placeholder Scenarios (31-40)
+  _StoryScenario(levelId: 31, title: 'Advanced Practice 31', prompt: 'Continue mastering advanced budgeting.', income: 102000, rent: 41000, minSavingsPercent: 0.25, minEmergencyAmount: 32000, jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment"]),
+  _StoryScenario(levelId: 32, title: 'Advanced Practice 32', prompt: 'Refine your wealth-building strategy.', income: 104000, rent: 42000, minSavingsPercent: 0.26, minEmergencyAmount: 33000, jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment"]),
+  _StoryScenario(levelId: 33, title: 'Advanced Practice 33', prompt: 'Optimize complex financial scenarios.', income: 106000, rent: 43000, minSavingsPercent: 0.27, minEmergencyAmount: 34000, jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment"]),
+  _StoryScenario(levelId: 34, title: 'Advanced Practice 34', prompt: 'Balance multiple investment priorities.', income: 108000, rent: 44000, minSavingsPercent: 0.28, minEmergencyAmount: 35000, jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment"]),
+  _StoryScenario(levelId: 35, title: 'Advanced Practice 35', prompt: 'Strengthen your financial foundation.', income: 110000, rent: 45000, minSavingsPercent: 0.29, minEmergencyAmount: 36000, jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment"]),
+  _StoryScenario(levelId: 36, title: 'Advanced Practice 36', prompt: 'Maximize wealth accumulation potential.', income: 112000, rent: 46000, minSavingsPercent: 0.30, minEmergencyAmount: 37000, jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment"]),
+  _StoryScenario(levelId: 37, title: 'Advanced Practice 37', prompt: 'Approach financial mastery.', income: 114000, rent: 47000, minSavingsPercent: 0.31, minEmergencyAmount: 38000, jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment"]),
+  _StoryScenario(levelId: 38, title: 'Advanced Practice 38', prompt: 'Nearly at the peak of financial planning.', income: 116000, rent: 48000, minSavingsPercent: 0.32, minEmergencyAmount: 39000, jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment"]),
+  _StoryScenario(levelId: 39, title: 'Advanced Practice 39', prompt: 'One step away from ultimate mastery!', income: 118000, rent: 49000, minSavingsPercent: 0.33, minEmergencyAmount: 40000, jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment"]),
+  _StoryScenario(levelId: 40, title: 'Ultimate Financial Master', prompt: 'Congratulations! Prove your complete mastery of financial planning.', income: 120000, rent: 50000, minSavingsPercent: 0.35, minEmergencyAmount: 45000, jarNames: ["Savings", "Emergency Fund", "Household", "Investment", "Debt Payment", "Retirement"]),
 ];
+
 
 class StoryScreen extends StatefulWidget {
   final UserProgress userProgress;
@@ -131,11 +263,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
   late final double totalIncome;
   late final double rentFixed;
 
-  Map<String, double> jars = {
-    "Savings": 0,
-    "Emergency Fund": 0,
-    "Household": 0,
-  };
+  Map<String, double> jars = {};
 
   @override
   void initState() {
@@ -146,6 +274,12 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
     );
     totalIncome = _scenario.income;
     rentFixed = _scenario.rent;
+    
+    // Initialize jars dynamically based on scenario
+    for (String jarName in _scenario.jarNames) {
+      jars[jarName] = 0;
+    }
+    
     _characterController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
@@ -157,6 +291,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
     );
     _characterController.repeat(reverse: true);
   }
+
 
   @override
   void dispose() {
@@ -431,155 +566,50 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
   Widget _buildMoneyBundle() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Draggable<String>(
-        data: 'money',
-        dragAnchorStrategy: pointerDragAnchorStrategy,
-        feedback: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Colors.green, Colors.lightGreen],
-              ),
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.green.withOpacity(0.5),
-                  blurRadius: 15,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.account_balance_wallet,
-                  color: Colors.white,
-                  size: 30,
-                ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Dragging",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      "₹${remainingToAllot.toInt()}",
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Colors.green, Colors.lightGreen],
         ),
-        childWhenDragging: Container(
-          padding: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.grey.shade300, Colors.grey.shade400],
-            ),
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: Colors.grey, width: 2, style: BorderStyle.solid),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.account_balance_wallet,
+            color: Colors.white,
+            size: 30,
+          ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.account_balance_wallet,
-                color: Colors.grey.shade600,
-                size: 30,
-              ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Money Bundle",
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    "Available: ₹${remainingToAllot.toInt()}",
-                    style: TextStyle(
-                      color: Colors.grey.shade500,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Colors.green, Colors.lightGreen],
-            ),
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.green.withOpacity(0.3),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.account_balance_wallet,
-                color: Colors.white,
-                size: 30,
-              ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Money Bundle",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    "Available: ₹${remainingToAllot.toInt()}",
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-              const Padding(
-                padding: EdgeInsets.only(left: 10),
-                child: Icon(
-                  Icons.drag_indicator,
+              const Text(
+                "Money Available",
+                style: TextStyle(
                   color: Colors.white,
-                  size: 20,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                "Tap jars below to allocate: ₹${remainingToAllot.toInt()}",
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
                 ),
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
@@ -623,7 +653,18 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
     );
   }
   
+  
   Widget _buildKitchenCounter() {
+    // Define jar colors
+    final Map<String, Color> jarColors = {
+      "Savings": const Color(0xFF60A5FA),
+      "Emergency Fund": const Color(0xFFF59E0B),
+      "Household": const Color(0xFF34D399),
+      "Investment": const Color(0xFF8B5CF6),
+      "Debt Payment": const Color(0xFFEF4444),
+      "Retirement": const Color(0xFF10B981),
+    };
+    
     return Container(
       margin: const EdgeInsets.all(20),
       child: Column(
@@ -652,19 +693,33 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
                 ),
               ],
             ),
-            child: Container(
-              margin: const EdgeInsets.all(20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // Rent Jar (Fixed)
-                  _buildCounterJar("Rent", rentFixed, const Color(0xFF6B7280), isFixed: true),
-                  
-                  // Interactive Jars
-                  _buildCounterJar("Savings", jars["Savings"]!, const Color(0xFF60A5FA), isFixed: false),
-                  _buildCounterJar("Emergency", jars["Emergency Fund"]!, const Color(0xFFF59E0B), isFixed: false),
-                  _buildCounterJar("Household", jars["Household"]!, const Color(0xFF34D399), isFixed: false),
-                ],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                margin: const EdgeInsets.all(20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Rent Jar (Fixed)
+                    _buildCounterJar("Rent", rentFixed, const Color(0xFF6B7280), isFixed: true),
+                    const SizedBox(width: 10),
+                    
+                    // Interactive Jars - Dynamic based on scenario
+                    ...jars.keys.map((jarName) {
+                      final displayName = jarName.length > 10 ? jarName.substring(0, 10) : jarName;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: _buildCounterJar(
+                          displayName,
+                          jars[jarName]!,
+                          jarColors[jarName] ?? const Color(0xFF60A5FA),
+                          isFixed: false,
+                          fullName: jarName,
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                ),
               ),
             ),
           ),
@@ -685,117 +740,113 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
     );
   }
   
-  Widget _buildCounterJar(String name, double amount, Color color, {required bool isFixed}) {
-    return DragTarget<String>(
-      onWillAccept: (data) => data == 'money' && !isFixed,
-      onAccept: (data) => _handleDrop(name == "Emergency" ? "Emergency Fund" : name),
-      builder: (context, candidateData, rejectedData) {
-        final isHovered = candidateData.isNotEmpty;
-        
-        return Column(
-          children: [
-            // Jar
-            Container(
-              width: 70,
-              height: 90,
-              decoration: BoxDecoration(
-                color: isFixed ? Colors.grey.shade400 : color,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
+  Widget _buildCounterJar(String name, double amount, Color color, {required bool isFixed, String? fullName}) {
+    final jarName = fullName ?? name;
+    
+    return GestureDetector(
+      onTap: isFixed ? null : () => _showAmountDialog(jarName),
+      child: Column(
+        children: [
+          // Jar
+          Container(
+            width: 70,
+            height: 90,
+            decoration: BoxDecoration(
+              color: isFixed ? Colors.grey.shade400 : color,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+              boxShadow: !isFixed
+                  ? [
+                      BoxShadow(
+                        color: color.withOpacity(0.3),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Column(
+              children: [
+                // Jar Lid
+                Container(
+                  width: 80,
+                  height: 15,
+                  decoration: BoxDecoration(
+                    color: isFixed ? Colors.grey.shade600 : _getDarkerColor(color),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                      topRight: Radius.circular(15),
+                    ),
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
                 ),
-                border: isHovered && !isFixed
-                    ? Border.all(color: color, width: 3)
-                    : null,
-                boxShadow: isHovered && !isFixed
-                    ? [
-                        BoxShadow(
-                          color: color.withOpacity(0.5),
-                          blurRadius: 10,
-                          spreadRadius: 2,
+                
+                // Jar Body
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isFixed ? Icons.lock : Icons.savings,
+                          color: Colors.white,
+                          size: 20,
                         ),
-                      ]
-                    : null,
-              ),
-              child: Column(
-                children: [
-                  // Jar Lid
-                  Container(
-                    width: 80,
-                    height: 15,
-                    decoration: BoxDecoration(
-                      color: isFixed ? Colors.grey.shade600 : _getDarkerColor(color),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15),
-                      ),
-                      border: Border.all(color: Colors.white, width: 1),
-                    ),
-                  ),
-                  
-                  // Jar Body
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(5),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            isFixed ? Icons.lock : Icons.savings,
+                        const SizedBox(height: 5),
+                        Text(
+                          name,
+                          style: const TextStyle(
                             color: Colors.white,
-                            size: 20,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 5),
-                          Text(
-                            name,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          "₹${amount.toInt()}",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
                           ),
-                          Text(
-                            "₹${amount.toInt()}",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-            
-            // Jar Label
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0B1220),
-                borderRadius: BorderRadius.circular(5),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 3,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Text(
-                name,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: isFixed ? const Color(0xFF9CA3AF) : const Color(0xFFE5E7EB),
                 ),
+              ],
+            ),
+          ),
+          
+          // Jar Label
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0B1220),
+              borderRadius: BorderRadius.circular(5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 3,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Text(
+              name,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: isFixed ? const Color(0xFF9CA3AF) : const Color(0xFFE5E7EB),
               ),
             ),
-          ],
-        );
-      },
+          ),
+        ],
+      ),
     );
   }
 }
