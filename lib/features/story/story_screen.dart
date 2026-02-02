@@ -315,13 +315,13 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
   }
 
   void _showAmountDialog(String jarName) {
-    final TextEditingController _controller = TextEditingController();
+    final TextEditingController controller = TextEditingController();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text("Add to $jarName"),
         content: TextField(
-          controller: _controller,
+          controller: controller,
           keyboardType: TextInputType.number,
           decoration: const InputDecoration(hintText: "Enter amount", prefixText: "₹"),
         ),
@@ -329,7 +329,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
           ElevatedButton(
             onPressed: () {
-              double amount = double.tryParse(_controller.text) ?? 0;
+              double amount = double.tryParse(controller.text) ?? 0;
               if (amount <= remainingToAllot) {
                 setState(() => jars[jarName] = jars[jarName]! + amount);
                 Navigator.pop(context);
@@ -717,7 +717,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
                           fullName: jarName,
                         ),
                       );
-                    }).toList(),
+                    }),
                   ],
                 ),
               ),

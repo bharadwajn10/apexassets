@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'features/home/home_screen.dart';
-import 'features/story/story_screen.dart';
-import 'features/budgeting/budget_screen.dart';
-import 'features/profile/profile_screen.dart';
 
-final Map<String, WidgetBuilder> appRoutes = {
-  '/': (context) => const HomeScreen(),
-  '/story': (context) => const StoryScreen(),
-  '/budget': (context) => const BudgetScreen(),
-  '/profile': (context) => const ProfileScreen(),
-};
+import 'features/home/home_screen.dart';
+import 'features/futureself/screens/future_entry_screen.dart';
+import 'features/futureself/screens/future_vision_screen.dart';
+import 'models/user_progress.dart';
+
+Map<String, WidgetBuilder> appRoutes(UserProgress progress) {
+  return {
+    '/': (context) => HomeScreen(globalProgress: progress),
+
+    '/future-entry': (context) => const FutureEntryScreen(),
+
+    '/future-vision': (context) => const FutureVisionScreen(),
+  };
+}
