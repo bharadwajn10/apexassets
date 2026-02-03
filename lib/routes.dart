@@ -9,7 +9,7 @@ Map<String, WidgetBuilder> appRoutes(UserProgress progress) {
   return {
     '/': (context) => HomeScreen(globalProgress: progress),
 
-    '/future-entry': (context) => const FutureEntryScreen(),
+    '/future-entry': (context) => FutureEntryScreen(progress: progress),
 
     '/future-vision': (context) => const FutureVisionScreen(),
   };

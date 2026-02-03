@@ -109,7 +109,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.auto_graph,
                     color: const Color(0xFF3B82F6),
                     onTap: () {
-                      Navigator.pushNamed(context, '/future-entry');
+                      Navigator.pushNamed(
+                        context,
+                        '/future-entry',
+                        arguments: widget.globalProgress,
+                      );
                     },
 
                   ),

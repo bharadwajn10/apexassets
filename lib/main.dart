@@ -51,8 +51,11 @@ class MyApp extends StatelessWidget {
             );
 
           case '/future-entry':
+            final progress = settings.arguments is UserProgress
+                ? settings.arguments as UserProgress
+                : userProgress;
             return MaterialPageRoute(
-              builder: (_) => const FutureEntryScreen(),
+              builder: (_) => FutureEntryScreen(progress: progress),
             );
 
           case '/avatar':
