@@ -1,5 +1,61 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
+// import 'dart:math' as flutter_math; // Unused
 import '../../models/user_progress.dart';
+
+// --- Shake Animation Widget ---
+// --- Shake Animation Widget ---
+// Removed unused ShakeWidget and SimpleShakeWidget implementations. 
+// Using ShakeItem below.
+
+class ShakeItem extends StatefulWidget {
+  final Widget child;
+  const ShakeItem({super.key, required this.child});
+  
+  @override
+  ShakeItemState createState() => ShakeItemState();
+}
+
+class ShakeItemState extends State<ShakeItem> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _offsetAnimation;
+  
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
+    _offsetAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 10.0, end: -10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -10.0, end: 10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 10.0, end: 0.0), weight: 1),
+    ]).animate(_controller);
+  }
+  
+  void shake() {
+    _controller.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(_offsetAnimation.value, 0),
+          child: child!,
+        );
+      },
+      child: widget.child,
+    );
+  }
+}
 
 class _StoryScenario {
   final int levelId;
@@ -11,7 +67,7 @@ class _StoryScenario {
   final double minEmergencyAmount;
   final List<String> jarNames;
 
-  const _StoryScenario({
+  _StoryScenario({
     required this.levelId,
     required this.title,
     required this.prompt,
@@ -19,11 +75,11 @@ class _StoryScenario {
     required this.rent,
     required this.minSavingsPercent,
     required this.minEmergencyAmount,
-    this.jarNames = const ["Savings", "Emergency Fund", "Household"],
-  });
+    List<String>? jarNames,
+  }) : jarNames = jarNames ?? const ["Savings", "Emergency Fund", "Household"];
 }
 
-const List<_StoryScenario> _storyScenarios = [
+final List<_StoryScenario> _storyScenarios = [
   // PHASE 1: BEGINNER LEVEL (Levels 1-20)
   // Active Scenarios (1-10)
   _StoryScenario(
@@ -264,6 +320,9 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
   late final double rentFixed;
 
   Map<String, double> jars = {};
+  
+  // Shake keys
+  final Map<String, GlobalKey<ShakeItemState>> _shakeKeys = {};
 
   @override
   void initState() {
@@ -278,6 +337,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
     // Initialize jars dynamically based on scenario
     for (String jarName in _scenario.jarNames) {
       jars[jarName] = 0;
+      _shakeKeys[jarName] = GlobalKey<ShakeItemState>();
     }
     
     _characterController = AnimationController(
@@ -337,6 +397,13 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Not enough money left!"))
                 );
+                // Trigger shake for this jar if possible, or general feedback
+                // Since the dialog is open, we can't easily shake the jar behind it visibly.
+                // But user requested "If the user violates a budget rule... make that specific Jar widget shake".
+                // This usually happens after they try to submit.
+                // We'll close dialog and shake.
+                Navigator.pop(context);
+                _shakeKeys[jarName]?.currentState?.shake();
               }
             },
             child: const Text("Add"),
@@ -412,6 +479,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
         ),
         child: SafeArea(
           child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(), // Completely disable scroll physics
             child: Column(
               children: [
                 // Header
@@ -505,27 +573,48 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
                 height: 80,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF334155), Color(0xFF0F172A)],
-                  ),
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                     BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      blurRadius: 10,
+                     )
+                  ]
                 ),
-                child: const Icon(
-                  Icons.account_balance,
-                  color: Color(0xFFE5E7EB),
-                  size: 50,
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/guide_character.jpg',
+                    fit: BoxFit.cover,
+                    width: 80,
+                    height: 80,
+                    errorBuilder: (c, e, s) => Container(
+                      width: 80,
+                      height: 80,
+                      color: const Color(0xFF334155),
+                      child: const Icon(
+                        Icons.account_balance,
+                        color: Color(0xFFE5E7EB),
+                        size: 40,
+                      ),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 20),
 
               // Speech Bubble
               Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0B1220),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Column(
+                child: CustomPaint(
+                   painter: BubbleTailPainter(color: const Color(0xFF0B1220)),
+                   child: Container(
+                    margin: const EdgeInsets.only(left: 10), // Space for tail
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0B1220),
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -556,6 +645,7 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
                   ),
                 ),
               ),
+            ),
             ],
           ),
         );
@@ -695,31 +785,30 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
             ),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Container(
-                margin: const EdgeInsets.all(20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    // Rent Jar (Fixed)
-                    _buildCounterJar("Rent", rentFixed, const Color(0xFF6B7280), isFixed: true),
-                    const SizedBox(width: 10),
-                    
-                    // Interactive Jars - Dynamic based on scenario
-                    ...jars.keys.map((jarName) {
-                      final displayName = jarName.length > 10 ? jarName.substring(0, 10) : jarName;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: _buildCounterJar(
-                          displayName,
-                          jars[jarName]!,
-                          jarColors[jarName] ?? const Color(0xFF60A5FA),
-                          isFixed: false,
-                          fullName: jarName,
-                        ),
-                      );
-                    }).toList(),
-                  ],
-                ),
+              physics: const NeverScrollableScrollPhysics(), // Disable horizontal scroll physics
+              padding: const EdgeInsets.symmetric(vertical: 50),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Rent Jar (Fixed)
+                  _buildCounterJar("Rent", rentFixed, const Color(0xFF6B7280), isFixed: true),
+                  const SizedBox(width: 10),
+                  
+                  // Interactive Jars - Dynamic based on scenario
+                  ...jars.keys.map((jarName) {
+                    final displayName = jarName.length > 10 ? jarName.substring(0, 10) : jarName;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: _buildCounterJar(
+                        displayName,
+                        jars[jarName]!,
+                        jarColors[jarName] ?? const Color(0xFF60A5FA),
+                        isFixed: false,
+                        fullName: jarName,
+                      ),
+                    );
+                  }).toList(),
+                ],
               ),
             ),
           ),
@@ -748,105 +837,146 @@ class _StoryScreenState extends State<StoryScreen> with TickerProviderStateMixin
       child: Column(
         children: [
           // Jar
-          Container(
-            width: 70,
-            height: 90,
-            decoration: BoxDecoration(
-              color: isFixed ? Colors.grey.shade400 : color,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
+          ShakeItem(
+            key: _shakeKeys[jarName],
+            child: Container(
+              width: 70,
+              height: 100, // Slightly taller
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                   // Glass Jar Body
+                   Container(
+                     decoration: BoxDecoration(
+                       color: Colors.white.withOpacity(0.1), // Glass tint
+                       borderRadius: const BorderRadius.only(
+                         topLeft: Radius.circular(10),
+                         topRight: Radius.circular(10),
+                         bottomLeft: Radius.circular(12),
+                         bottomRight: Radius.circular(12),
+                       ),
+                       border: Border.all(
+                         color: Colors.white.withOpacity(0.3),
+                         width: 1.5,
+                       ),
+                     ),
+                     child: ClipRRect(
+                       borderRadius: const BorderRadius.only(
+                         topLeft: Radius.circular(8),
+                         topRight: Radius.circular(8),
+                         bottomLeft: Radius.circular(10),
+                         bottomRight: Radius.circular(10),
+                       ),
+                       child: Stack(
+                         alignment: Alignment.bottomCenter,
+                         children: [
+                           // Backdrop Blur
+                           BackdropFilter(
+                             filter: ui.ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                             child: Container(color: Colors.transparent),
+                           ),
+                           
+                           // Liquid Fill
+                           LayoutBuilder(
+                             builder: (ctx, constraints) {
+                               double fillPercent = 0.0;
+                               if (isFixed) {
+                                 fillPercent = 0.8; // Fixed rent usually full-ish
+                               } else {
+                                  // Arbitrary visual cap at 15000 for visuals
+                                  fillPercent = (amount / 15000).clamp(0.0, 1.0);
+                               }
+                               
+                               return AnimatedContainer(
+                                 duration: const Duration(milliseconds: 800),
+                                 curve: Curves.easeOutQuart,
+                                 height: constraints.maxHeight * fillPercent,
+                                 width: double.infinity,
+                                 decoration: BoxDecoration(
+                                   color: color.withOpacity(0.8),
+                                   borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
+                                 ),
+                               );
+                             },
+                           ),
+                           
+                           // Icon & Text overlay
+                           Column(
+                             mainAxisAlignment: MainAxisAlignment.center,
+                             children: [
+                                Icon(
+                                  isFixed ? Icons.lock : Icons.savings,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                const SizedBox(height: 5),
+                             ],
+                           ),
+                         ],
+                       ),
+                     ),
+                   ),
+                   
+                   // Lid
+                   Positioned(
+                     top: 0,
+                     child: Container(
+                        width: 76,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: isFixed ? Colors.grey.shade700 : _getDarkerColor(color),
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: Colors.white30),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0,2))
+                          ]
+                        ),
+                     ),
+                   ),
+                ],
               ),
-              boxShadow: !isFixed
-                  ? [
-                      BoxShadow(
-                        color: color.withOpacity(0.3),
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Column(
-              children: [
-                // Jar Lid
-                Container(
-                  width: 80,
-                  height: 15,
-                  decoration: BoxDecoration(
-                    color: isFixed ? Colors.grey.shade600 : _getDarkerColor(color),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15),
-                    ),
-                    border: Border.all(color: Colors.white, width: 1),
-                  ),
-                ),
-                
-                // Jar Body
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isFixed ? Icons.lock : Icons.savings,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          "₹${amount.toInt()}",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
           
-          // Jar Label
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-            decoration: BoxDecoration(
-              color: const Color(0xFF0B1220),
-              borderRadius: BorderRadius.circular(5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 3,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Text(
-              name,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: isFixed ? const Color(0xFF9CA3AF) : const Color(0xFFE5E7EB),
-              ),
+          const SizedBox(height: 5),
+          Text(
+            name,
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
+          ),
+          Text(
+            "₹${amount.toInt()}",
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
             ),
           ),
         ],
       ),
     );
   }
+}
+
+class BubbleTailPainter extends CustomPainter {
+  final Color color;
+  BubbleTailPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    // Draw a triangle on the left side
+    path.moveTo(0, 20);
+    path.lineTo(-10, 30);
+    path.lineTo(0, 40);
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
